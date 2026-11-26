@@ -203,6 +203,7 @@ class RouteDefinition {
 }
 
 enum SimulationMode { speed, cadence }
+
 /// 模拟参数。
 ///
 /// 默认值：速度 15m/s、循环 100 圈、每米 1 步、
@@ -396,7 +397,6 @@ class SimulationConfig {
             (json['floatingWindowButtonSize'] as num?)?.toInt() ?? 44,
       );
 }
-
 
 class NfcConfig {
   const NfcConfig({
@@ -689,4 +689,3 @@ class InternalAccountProfile {
     );
   }
 }
-

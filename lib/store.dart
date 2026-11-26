@@ -74,8 +74,8 @@ class AppStore extends ChangeNotifier {
       var resolvedId = '';
       var resolvedName = '';
       try {
-        final info = await _channel
-            .invokeMethod<Map<dynamic, dynamic>>('deviceInfo');
+        final info =
+            await _channel.invokeMethod<Map<dynamic, dynamic>>('deviceInfo');
         resolvedId = info?['deviceId'] as String? ?? '';
         resolvedName = info?['deviceName'] as String? ?? '';
       } on MissingPluginException {

@@ -200,8 +200,7 @@ class _AppShellState extends State<AppShell> {
     if (widget.store.shareBaseUrl.isEmpty) return;
     Future<void>(() async {
       try {
-        final config =
-            await ShareApi(widget.store.shareBaseUrl).clientConfig();
+        final config = await ShareApi(widget.store.shareBaseUrl).clientConfig();
         if (!mounted || !config.hasNotice) return;
         await showDialog<void>(
           context: context,
@@ -215,7 +214,8 @@ class _AppShellState extends State<AppShell> {
               if (config.bilibiliUrl.isNotEmpty)
                 TextButton(
                   onPressed: () {
-                    const MethodChannel('schoolrun/platform').invokeMethod<bool>(
+                    const MethodChannel('schoolrun/platform')
+                        .invokeMethod<bool>(
                       'openUrl',
                       {'url': config.bilibiliUrl},
                     );
@@ -1291,7 +1291,6 @@ class _Joystick extends StatelessWidget {
       );
 }
 
-
 class RouteLibraryPage extends StatefulWidget {
   const RouteLibraryPage({
     required this.store,
@@ -1316,10 +1315,12 @@ class _RouteLibraryPageState extends State<RouteLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final localRoutes = widget.store.routes
-        .where((route) => route.name.toLowerCase().contains(query.toLowerCase()))
+        .where(
+            (route) => route.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
     final sharedRoutes = remoteRoutes
-        .where((route) => route.name.toLowerCase().contains(query.toLowerCase()))
+        .where(
+            (route) => route.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
     return SafeArea(
       child: Column(
@@ -1497,8 +1498,7 @@ class _RouteLibraryPageState extends State<RouteLibraryPage> {
                         const SizedBox(height: 5),
                         Text(
                           '${item.pointCount} 个点  ·  ${item.privacyMode ? '隐私路线（只能直接模拟）' : '可下载'}',
-                          style:
-                              const TextStyle(fontSize: 12, color: _muted),
+                          style: const TextStyle(fontSize: 12, color: _muted),
                         ),
                       ],
                     ),
@@ -1659,8 +1659,6 @@ class _RouteLibraryPageState extends State<RouteLibraryPage> {
     if (confirmed == true) await widget.store.deleteRoute(route);
   }
 }
-
-
 
 class RouteEditorPage extends StatefulWidget {
   const RouteEditorPage({
@@ -2035,8 +2033,7 @@ class _RouteEditorPageState extends State<RouteEditorPage> {
       // 取消闭合时要撤掉上次追加的重复首点，否则会留下一个零长度线段。
       _recordChange();
       final next = List<RoutePoint>.of(points);
-      if (next.length > 1 &&
-          distanceMeters(next.first, next.last) < 0.01) {
+      if (next.length > 1 && distanceMeters(next.first, next.last) < 0.01) {
         next.removeLast();
       }
       setState(() {
@@ -2354,7 +2351,8 @@ class _SimulationPageState extends State<SimulationPage> {
   @override
   Widget build(BuildContext context) {
     final currentPoint = frame?.point;
-    final masked = widget.route.privacyMode && widget.route.downloadedFromShared;
+    final masked =
+        widget.route.privacyMode && widget.route.downloadedFromShared;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -2469,8 +2467,7 @@ class _SimulationPageState extends State<SimulationPage> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         sensorSummary,
-                        style:
-                            const TextStyle(fontSize: 12, color: _muted),
+                        style: const TextStyle(fontSize: 12, color: _muted),
                       ),
                     ),
                   ],
@@ -2487,9 +2484,7 @@ class _SimulationPageState extends State<SimulationPage> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: widget.route.hasEnoughPoints
-                          ? (running || paused
-                              ? _togglePause
-                              : _start)
+                          ? (running || paused ? _togglePause : _start)
                           : null,
                       icon: Icon(
                         running || paused
@@ -2601,9 +2596,7 @@ class _SimulationPageState extends State<SimulationPage> {
     if (mounted) {
       _toast(
         context,
-        dispatchNfc
-            ? '模拟已开始，正在跳转目标应用；离开本应用后小窗会自动浮出。'
-            : '模拟已开始；离开本应用后小窗会自动浮出。',
+        dispatchNfc ? '模拟已开始，正在跳转目标应用；离开本应用后小窗会自动浮出。' : '模拟已开始；离开本应用后小窗会自动浮出。',
       );
     }
 
@@ -2789,8 +2782,8 @@ class _SimulationPageState extends State<SimulationPage> {
     Map<String, dynamic>? arguments,
   ]) async {
     try {
-      return await const MethodChannel('schoolrun/platform')
-          .invokeMethod<bool>(method, arguments ?? {'routeId': widget.route.id});
+      return await const MethodChannel('schoolrun/platform').invokeMethod<bool>(
+          method, arguments ?? {'routeId': widget.route.id});
     } on MissingPluginException {
       if (method == 'startMockLocation' && mounted) {
         _toast(context, '系统模拟定位桥接未启用，当前只展示路线模拟进度。');
@@ -2814,8 +2807,6 @@ class _SimulationPageState extends State<SimulationPage> {
         ),
       );
 }
-
-
 
 class _SimulationSettings extends StatelessWidget {
   const _SimulationSettings({required this.config, required this.onChanged});
@@ -3295,9 +3286,7 @@ class _NfcPageState extends State<NfcPage> {
             child: ListTile(
               dense: true,
               leading: Icon(
-                hardwareStatus == 'NFC 已就绪'
-                    ? Icons.check_circle
-                    : Icons.info,
+                hardwareStatus == 'NFC 已就绪' ? Icons.check_circle : Icons.info,
                 color: hardwareStatus == 'NFC 已就绪' ? _teal : _coral,
               ),
               title: Text(hardwareStatus),
@@ -3333,8 +3322,7 @@ class _NfcPageState extends State<NfcPage> {
                           color: const Color(0xFFE9EAF8),
                           borderRadius: BorderRadius.circular(11),
                         ),
-                        child:
-                            const Icon(Icons.nfc, color: Color(0xFF6674B7)),
+                        child: const Icon(Icons.nfc, color: Color(0xFF6674B7)),
                       ),
                       const SizedBox(width: 10),
                       const Expanded(
@@ -3488,8 +3476,7 @@ class _NfcPageState extends State<NfcPage> {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
                   child: ListTile(
-                    leading:
-                        const Icon(Icons.bookmark_outline, color: _teal),
+                    leading: const Icon(Icons.bookmark_outline, color: _teal),
                     title: Text(
                       config.name,
                       style: const TextStyle(fontWeight: FontWeight.w700),
@@ -3702,8 +3689,7 @@ class _NfcPageState extends State<NfcPage> {
           ? widget.store.nfcConfigs.first.name
           : 'nfc_${DateTime.now().millisecondsSinceEpoch}',
     );
-    final urlControllerLocal =
-        TextEditingController(text: urlController.text);
+    final urlControllerLocal = TextEditingController(text: urlController.text);
     final packageControllerLocal =
         TextEditingController(text: packageController.text);
     var shareSource = source;
@@ -3718,8 +3704,7 @@ class _NfcPageState extends State<NfcPage> {
               children: [
                 if (widget.store.nfcConfigs.isNotEmpty)
                   DropdownButtonFormField<String>(
-                    decoration:
-                        const InputDecoration(labelText: '从本地配置载入'),
+                    decoration: const InputDecoration(labelText: '从本地配置载入'),
                     items: widget.store.nfcConfigs
                         .map((item) => DropdownMenuItem(
                               value: item.name,
@@ -3789,8 +3774,7 @@ class _NfcPageState extends State<NfcPage> {
         packageName: packageName,
         source: shareSource,
       );
-      await ShareApi(widget.store.shareBaseUrl,
-              token: widget.store.authToken)
+      await ShareApi(widget.store.shareBaseUrl, token: widget.store.authToken)
           .uploadNfc(config);
       await widget.store.saveNfcTemplate(config);
       if (mounted) _toast(context, 'NFC 配置已共享');
@@ -3842,10 +3826,9 @@ class _NfcPageState extends State<NfcPage> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           final filtered = values
-              .where((item) =>
-                  '${item.name}${item.packageName}${item.url}'
-                      .toLowerCase()
-                      .contains(query.toLowerCase()))
+              .where((item) => '${item.name}${item.packageName}${item.url}'
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
               .toList();
           return AlertDialog(
             title: const Text('选择共享 NFC'),
@@ -3856,8 +3839,7 @@ class _NfcPageState extends State<NfcPage> {
                 children: [
                   TextField(
                     autofocus: true,
-                    onChanged: (value) =>
-                        setDialogState(() => query = value),
+                    onChanged: (value) => setDialogState(() => query = value),
                     decoration: const InputDecoration(
                       hintText: '搜索名称 / 包名 / URL',
                       prefixIcon: Icon(Icons.search),
@@ -3906,7 +3888,6 @@ String sourceLabel(String source) => switch (source) {
       'shared' => '共享配置',
       _ => '手动输入',
     };
-
 
 class DebugLabPage extends StatefulWidget {
   const DebugLabPage({required this.store, super.key});
@@ -4088,9 +4069,7 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
                   color: _teal,
                 ),
                 title: Text(
-                  loggedIn
-                      ? '已登录：${widget.store.accountName}'
-                      : '未登录共享服务',
+                  loggedIn ? '已登录：${widget.store.accountName}' : '未登录共享服务',
                   style: const TextStyle(fontWeight: FontWeight.w800),
                 ),
                 subtitle: Text(
@@ -4109,14 +4088,11 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
                             widget.store.clearShareSession();
                         },
                         itemBuilder: (context) => const [
-                          PopupMenuItem(
-                              value: 'switch', child: Text('切换账号')),
-                          PopupMenuItem(
-                              value: 'logout', child: Text('退出登录')),
+                          PopupMenuItem(value: 'switch', child: Text('切换账号')),
+                          PopupMenuItem(value: 'logout', child: Text('退出登录')),
                         ],
                       )
-                    : TextButton(
-                        onPressed: _login, child: const Text('登录')),
+                    : TextButton(onPressed: _login, child: const Text('登录')),
               ),
             ),
             const SizedBox(height: 10),
@@ -4179,23 +4155,23 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
                           children: [
                             if (clientConfig!.qqGroupNumber.isNotEmpty)
                               Chip(
-                                avatar: const Icon(Icons.groups_outlined,
-                                    size: 16),
-                                label: Text(
-                                    'QQ 群 ${clientConfig!.qqGroupNumber}'),
+                                avatar:
+                                    const Icon(Icons.groups_outlined, size: 16),
+                                label:
+                                    Text('QQ 群 ${clientConfig!.qqGroupNumber}'),
                               ),
                             if (clientConfig!.bilibiliUrl.isNotEmpty)
                               ActionChip(
-                                avatar: const Icon(Icons.ondemand_video,
-                                    size: 16),
+                                avatar:
+                                    const Icon(Icons.ondemand_video, size: 16),
                                 label: Text(
                                   clientConfig!.bilibiliText.isEmpty
                                       ? 'B 站'
                                       : clientConfig!.bilibiliText,
                                 ),
-                                onPressed: () => const MethodChannel(
-                                        'schoolrun/platform')
-                                    .invokeMethod<bool>(
+                                onPressed: () =>
+                                    const MethodChannel('schoolrun/platform')
+                                        .invokeMethod<bool>(
                                   'openUrl',
                                   {'url': clientConfig!.bilibiliUrl},
                                 ),
@@ -4255,8 +4231,8 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.cloud_download_outlined,
-                        color: _teal),
+                    leading:
+                        const Icon(Icons.cloud_download_outlined, color: _teal),
                     title: const Text('下载共享路线'),
                     subtitle: const Text('把服务器上的非隐私路线保存到本地',
                         style: TextStyle(fontSize: 12, color: _muted)),
@@ -4468,9 +4444,8 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
     final packageController = TextEditingController(
       text: widget.store.nfcPackage,
     );
-    var source = widget.store.nfcSource.isEmpty
-        ? 'manual'
-        : widget.store.nfcSource;
+    var source =
+        widget.store.nfcSource.isEmpty ? 'manual' : widget.store.nfcSource;
     NfcConfig? picked;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -4677,8 +4652,6 @@ class _ShareCenterPageState extends State<ShareCenterPage> {
   }
 }
 
-
-
 class MinePage extends StatelessWidget {
   const MinePage({required this.store, super.key});
   final AppStore store;
@@ -4844,7 +4817,8 @@ class MinePage extends StatelessWidget {
                       style: const TextStyle(fontSize: 12, color: _muted),
                     ),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _open(context, InternalLoginPage(store: store)),
+                    onTap: () =>
+                        _open(context, InternalLoginPage(store: store)),
                   ),
                   const Divider(height: 1),
                 ],
@@ -5115,8 +5089,7 @@ class SettingsPage extends StatelessWidget {
                   const ListTile(
                     leading: Icon(Icons.info_outline, color: _teal),
                     title: Text('版本'),
-                    trailing:
-                        Text('v2.1.0', style: TextStyle(color: _muted)),
+                    trailing: Text('v2.1.0', style: TextStyle(color: _muted)),
                   ),
                   const Divider(height: 1),
                   ListTile(

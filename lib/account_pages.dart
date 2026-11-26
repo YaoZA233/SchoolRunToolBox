@@ -71,9 +71,7 @@ class _InternalLoginPageState extends State<InternalLoginPage> {
                 color: _teal,
               ),
               title: Text(
-                loggedIn
-                    ? '已登录：${widget.store.accountName}'
-                    : statusText,
+                loggedIn ? '已登录：${widget.store.accountName}' : statusText,
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
               subtitle: Text(

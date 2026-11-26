@@ -288,8 +288,7 @@ class ShareApi {
       request.headers.set(HttpHeaders.acceptHeader, 'application/json');
       request.headers.set('X-Client-Variant', _clientVariant);
       if (withToken && token.isNotEmpty) {
-        request.headers
-            .set(HttpHeaders.authorizationHeader, 'Bearer $token');
+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
       }
       if (body != null) {
         request.headers.contentType = ContentType.json;

@@ -61,10 +61,8 @@ LatLng _wgs84ToGcj02(double longitude, double latitude) {
   var magic = math.sin(radLat);
   magic = 1 - _ee * magic * magic;
   final sqrtMagic = math.sqrt(magic);
-  dLat = (dLat * 180.0) /
-      ((_a * (1 - _ee)) / (magic * sqrtMagic) * _pi);
-  dLng = (dLng * 180.0) /
-      (_a / sqrtMagic * math.cos(radLat) * _pi);
+  dLat = (dLat * 180.0) / ((_a * (1 - _ee)) / (magic * sqrtMagic) * _pi);
+  dLng = (dLng * 180.0) / (_a / sqrtMagic * math.cos(radLat) * _pi);
   return LatLng(longitude + dLng, latitude + dLat);
 }
 
@@ -83,15 +81,12 @@ double _transformLat(double x, double y) {
       0.2 * y * y +
       0.1 * x * y +
       0.2 * math.sqrt(x.abs());
-  ret += (20.0 * math.sin(6.0 * x * _pi) +
-          20.0 * math.sin(2.0 * x * _pi)) *
+  ret += (20.0 * math.sin(6.0 * x * _pi) + 20.0 * math.sin(2.0 * x * _pi)) *
       2.0 /
       3.0;
-  ret += (20.0 * math.sin(y * _pi) + 40.0 * math.sin(y / 3.0 * _pi)) *
-      2.0 /
-      3.0;
-  ret += (160.0 * math.sin(y / 12.0 * _pi) +
-          320 * math.sin(y * _pi / 30.0)) *
+  ret +=
+      (20.0 * math.sin(y * _pi) + 40.0 * math.sin(y / 3.0 * _pi)) * 2.0 / 3.0;
+  ret += (160.0 * math.sin(y / 12.0 * _pi) + 320 * math.sin(y * _pi / 30.0)) *
       2.0 /
       3.0;
   return ret;
@@ -104,15 +99,12 @@ double _transformLon(double x, double y) {
       0.1 * x * x +
       0.1 * x * y +
       0.1 * math.sqrt(x.abs());
-  ret += (20.0 * math.sin(6.0 * x * _pi) +
-          20.0 * math.sin(2.0 * x * _pi)) *
+  ret += (20.0 * math.sin(6.0 * x * _pi) + 20.0 * math.sin(2.0 * x * _pi)) *
       2.0 /
       3.0;
-  ret += (20.0 * math.sin(x * _pi) + 40.0 * math.sin(x / 3.0 * _pi)) *
-      2.0 /
-      3.0;
-  ret += (150.0 * math.sin(x / 12.0 * _pi) +
-          300.0 * math.sin(x / 30.0 * _pi)) *
+  ret +=
+      (20.0 * math.sin(x * _pi) + 40.0 * math.sin(x / 3.0 * _pi)) * 2.0 / 3.0;
+  ret += (150.0 * math.sin(x / 12.0 * _pi) + 300.0 * math.sin(x / 30.0 * _pi)) *
       2.0 /
       3.0;
   return ret;

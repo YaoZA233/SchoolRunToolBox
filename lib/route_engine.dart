@@ -55,7 +55,8 @@ List<RoutePoint> insertEvenlySpacedPoints(List<RoutePoint> source, int count) {
 
   final placements = <_PointPlacement>[];
   for (var index = 0; index < points.length; index++) {
-    placements.add(_PointPlacement(cumulative[index], points[index], index, true));
+    placements
+        .add(_PointPlacement(cumulative[index], points[index], index, true));
   }
   for (var insertIndex = 1; insertIndex <= count; insertIndex++) {
     final target = total * (insertIndex / (count + 1));
@@ -131,10 +132,8 @@ List<RoutePoint> removeEvenlySpacedNonKeyPoints(
   } else {
     var previousPosition = -1;
     for (var removalIndex = 1; removalIndex <= clamped; removalIndex++) {
-      var position = (removalIndex *
-                  ((removable.length + 1) / (clamped + 1)))
-              .floor() -
-          1;
+      var position =
+          (removalIndex * ((removable.length + 1) / (clamped + 1))).floor() - 1;
       position = math.max(
         previousPosition + 1,
         math.min(removable.length - 1, position),
@@ -236,10 +235,8 @@ double _estimateAngleDegrees(
   RoutePoint target,
 ) {
   final latitudeRadians = origin.latitude * math.pi / 180;
-  final north = (target.latitude - origin.latitude) *
-      math.pi /
-      180 *
-      _earthRadiusMeters;
+  final north =
+      (target.latitude - origin.latitude) * math.pi / 180 * _earthRadiusMeters;
   final east = (target.longitude - origin.longitude) *
       math.pi /
       180 *
@@ -307,7 +304,8 @@ List<RoutePoint> insertPointOnRoute(
   ProjectionResult projection,
 ) {
   if (!projection.isValid || points.length < 2) return List.of(points);
-  final insertIndex = (projection.segmentStartIndex + 1).clamp(0, points.length);
+  final insertIndex =
+      (projection.segmentStartIndex + 1).clamp(0, points.length);
   final result = List<RoutePoint>.of(points);
   result.insert(insertIndex, projection.point!);
   return result;
@@ -413,10 +411,9 @@ class RouteSimulationEngine {
     final smoothing = 0.15 + frequency * 0.55;
     _currentIntensityOffset +=
         (_targetIntensityOffset - _currentIntensityOffset) * smoothing;
-    _currentIntensityOffset =
-        _currentIntensityOffset.clamp(-range, range);
-    final minimumSpeed =
-        math.max(_minimumSimulationSpeed, baseSpeed * _minimumDynamicSpeedRatio);
+    _currentIntensityOffset = _currentIntensityOffset.clamp(-range, range);
+    final minimumSpeed = math.max(
+        _minimumSimulationSpeed, baseSpeed * _minimumDynamicSpeedRatio);
     return (baseSpeed + _currentIntensityOffset)
         .clamp(minimumSpeed, baseSpeed + range);
   }
@@ -446,8 +443,8 @@ class RouteSimulationEngine {
       final remainingInSegment = segmentDistance - _progressInSegmentMeters;
       if (distanceStep < remainingInSegment) {
         _progressInSegmentMeters += distanceStep;
-        final ratio = (_progressInSegmentMeters / segmentDistance)
-            .clamp(0.0, 1.0);
+        final ratio =
+            (_progressInSegmentMeters / segmentDistance).clamp(0.0, 1.0);
         final interpolated = currentPoint.lerp(nextPoint, ratio);
         final bearing = _bearingDegrees(currentPoint, nextPoint);
         final simulated = _applyNaturalAltitudeVariation(
@@ -490,7 +487,8 @@ class RouteSimulationEngine {
         finished: _finished,
       );
     }
-    final stepsPerMeter = config.stepsPerMeter <= 0 ? 1.0 : config.stepsPerMeter;
+    final stepsPerMeter =
+        config.stepsPerMeter <= 0 ? 1.0 : config.stepsPerMeter;
     _pendingLinkedDistanceMeters += steps / stepsPerMeter;
     final threshold = config.linkRatio <= 0 ? 1.0 : config.linkRatio;
     if (_pendingLinkedDistanceMeters < threshold) {
@@ -546,7 +544,8 @@ class RouteSimulationEngine {
     _progressInSegmentMeters = 0;
     var remaining = math.max(0.0, traveled);
     for (var index = 0; index < _points.length - 1; index++) {
-      final segmentDistance = distanceMeters(_points[index], _points[index + 1]);
+      final segmentDistance =
+          distanceMeters(_points[index], _points[index + 1]);
       if (index == _points.length - 2) {
         _segmentIndex = index;
         _progressInSegmentMeters = math.min(remaining, segmentDistance);
@@ -630,7 +629,8 @@ class RouteSimulationEngine {
     }
     final smoothing = 0.12 + probability * 0.55;
     _currentAltitudeOffsetMeters +=
-        (_targetAltitudeOffsetMeters - _currentAltitudeOffsetMeters) * smoothing;
+        (_targetAltitudeOffsetMeters - _currentAltitudeOffsetMeters) *
+            smoothing;
     _currentAltitudeOffsetMeters =
         _currentAltitudeOffsetMeters.clamp(-range, range);
     return RoutePoint(
@@ -678,7 +678,8 @@ class RouteSimulationEngine {
 }
 
 class _PointPlacement {
-  const _PointPlacement(this.distance, this.point, this.sequence, this.original);
+  const _PointPlacement(
+      this.distance, this.point, this.sequence, this.original);
 
   final double distance;
   final RoutePoint point;
