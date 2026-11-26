@@ -1,0 +1,89 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def signingPropertiesFile = rootProject.file("key.properties")
+def signingProperties = new Properties()
+if (signingPropertiesFile.exists()) {
+    signingProperties.load(new FileInputStream(signingPropertiesFile))
+}
+def releaseStorePath = signingProperties.getProperty("storeFile")
+def hasReleaseKey = signingPropertiesFile.exists() &&
+        releaseStorePath != null && rootProject.file(releaseStorePath).exists()
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { stream -> localProperties.load(stream) }
+}
+def mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: project.findProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY") ?: ""
+def escapedMapsApiKey = mapsApiKey.replace('\\', '\\\\').replace('"', '\\"')
+
+android {
+    namespace "com.campusruntoolbox.flutter"
+    compileSdk flutter.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.campusruntoolbox.flutter"
+        minSdk flutter.minSdkVersion
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+        manifestPlaceholders = [BAIDU_MAPS_API_KEY: mapsApiKey.trim().isEmpty() ? "NO_BAIDU_MAPS_API_KEY_CONFIGURED" : mapsApiKey]
+        buildConfigField "String", "MAPS_API_KEY", "\"${escapedMapsApiKey}\""
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
+        }
+    }
+
+    signingConfigs {
+        release {
+            if (hasReleaseKey) {
+                keyAlias signingProperties.getProperty("keyAlias")
+                keyPassword signingProperties.getProperty("keyPassword")
+                storeFile rootProject.file(releaseStorePath)
+                storePassword signingProperties.getProperty("storePassword")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig hasReleaseKey ? signingConfigs.release : signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        buildConfig true
+    }
+
+    lintOptions {
+        // 允许在 release 版本中使用 ACCESS_MOCK_LOCATION 权限
+        // 这是校园跑应用的核心功能需求
+        disable 'MockLocation'
+        // 也可以使用 warning 而不是 disable，这样会显示警告但不会阻止构建
+        // warning 'MockLocation'
+    }
+}
+
+def originalBaiduJar = file("libs/BaiduLBS_Android.jar")
+dependencies {
+    if (originalBaiduJar.exists()) {
+        implementation files(originalBaiduJar)
+    }
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+}
+
+flutter { source "../.." }

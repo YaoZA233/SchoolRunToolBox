@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        WARNING: Mock location permission in release builds
+
+        This permission allows the app to provide mock location data to the system.
+        Including this in release builds has the following implications:
+
+        1. Google Play Store: Apps with this permission may be flagged during review
+        2. Security: Users can see this app has mock location capability
+        3. Use case: Required for campus running apps that simulate GPS routes
+
+        This is intentionally included for release builds as the core functionality
+        of this app requires location simulation capabilities.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+</manifest>
