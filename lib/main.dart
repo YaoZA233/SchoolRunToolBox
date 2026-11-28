@@ -2500,7 +2500,7 @@ class _SimulationPageState extends State<SimulationPage> {
                       ),
                     ),
                   ),
-                  if (running || paused) ...[
+                  if (running || paused || completed) ...[
                     const SizedBox(width: 10),
                     Expanded(
                       child: OutlinedButton.icon(
@@ -2541,7 +2541,14 @@ class _SimulationPageState extends State<SimulationPage> {
       final proceed = await _showMockLocationGuide(
         developerOptions: state['developerOptions'] == true,
       );
-      if (proceed != true) return;
+      if (proceed == true && mounted) {
+        _toast(context, '设置完成后返回并重新点击开始模拟');
+      }
+      return;
+    }
+    if (state == null) {
+      if (mounted) _toast(context, '无法检查模拟位置权限，请重试');
+      return;
     }
     if (!mounted) return;
     engine = RouteSimulationEngine(widget.route, config);
@@ -2558,9 +2565,13 @@ class _SimulationPageState extends State<SimulationPage> {
     _invoke('keepScreenOn', {'enabled': false});
 
     final first = widget.route.points.first;
-    await _invoke('startMockLocation');
-    // 先把首点灌给原生服务，目标应用立刻能读到位置。
-    await _invoke('pushLocation', {
+    final started = await _invoke('startMockLocation');
+    if (started != true) {
+      await _rollbackStart();
+      return;
+    }
+    // 先把首点交给原生服务。
+    final pushed = await _invoke('pushLocation', {
       'latitude': first.latitude,
       'longitude': first.longitude,
       'altitude': first.altitude,
@@ -2572,12 +2583,16 @@ class _SimulationPageState extends State<SimulationPage> {
       'networkSimulation': config.networkSimulation,
       'intervalMillis': config.updateIntervalMs,
     });
+    if (pushed != true) {
+      await _rollbackStart();
+      return;
+    }
 
     final dispatchNfc = widget.store.nfcDispatchArmed &&
         widget.store.nfcUrl.isNotEmpty &&
         widget.store.nfcPackage.isNotEmpty;
     if (dispatchNfc) widget.store.armNfcDispatch(false);
-    await _invoke('startRouteSimulation', {
+    final routeStarted = await _invoke('startRouteSimulation', {
       'title': widget.route.name,
       'latitude': first.latitude,
       'longitude': first.longitude,
@@ -2596,7 +2611,11 @@ class _SimulationPageState extends State<SimulationPage> {
     if (mounted) {
       _toast(
         context,
-        dispatchNfc ? '模拟已开始，正在跳转目标应用；离开本应用后小窗会自动浮出。' : '模拟已开始；离开本应用后小窗会自动浮出。',
+        routeStarted != true
+            ? '定位服务已启动，但路线悬浮窗或 NFC 跳转未成功，请检查。'
+            : dispatchNfc
+                ? '模拟已开始，正在跳转目标应用。'
+                : '模拟已开始。',
       );
     }
 
@@ -2621,6 +2640,19 @@ class _SimulationPageState extends State<SimulationPage> {
     });
   }
 
+  Future<void> _rollbackStart() async {
+    await _invoke('stopRouteSimulation');
+    await _invoke('stopMockLocation');
+    widget.store.setSimulationRunning(false);
+    if (mounted) {
+      setState(() {
+        running = false;
+        paused = false;
+      });
+      _toast(context, '模拟启动失败，请检查系统权限后重试');
+    }
+  }
+
   void _startTimer() {
     timer?.cancel();
     timer = Timer.periodic(Duration(milliseconds: config.tickMillis), (_) {
@@ -2638,6 +2670,19 @@ class _SimulationPageState extends State<SimulationPage> {
     } else {
       timer?.cancel();
       setState(() => paused = true);
+      final point = frame?.point ?? widget.route.points.first;
+      _invoke('pushLocation', {
+        'latitude': point.latitude,
+        'longitude': point.longitude,
+        'altitude': point.altitude,
+        'speed': 0.0,
+        'bearing': frame?.bearing ?? 0.0,
+        'satelliteCount': config.satelliteCount,
+        'signalQuality': config.signalQuality,
+        'hdop': config.hdop,
+        'networkSimulation': config.networkSimulation,
+        'intervalMillis': config.updateIntervalMs,
+      });
     }
     _syncOverlayState();
   }

@@ -87,4 +87,38 @@ void main() {
     expect(frame.progress, greaterThan(0));
     expect(frame.point.longitude, greaterThan(route.first.longitude));
   });
+  test('step-linked frames retain position until the next threshold', () {
+    final definition = RouteDefinition(
+      id: 'step-position',
+      name: 'steps',
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+      points: route,
+    );
+    final engine = RouteSimulationEngine(
+        definition,
+        const SimulationConfig(
+            speed: 2, stepsPerMeter: 1, linkRatio: 2, dynamicIntensity: false));
+    final advanced = engine.nextForSteps(2);
+    final waiting = engine.nextForSteps(1);
+    expect(waiting.point.longitude, advanced.point.longitude);
+    expect(waiting.point.latitude, advanced.point.latitude);
+    expect(waiting.progress, advanced.progress);
+  });
+
+  test('step-linked batches consume every complete threshold', () {
+    final definition = RouteDefinition(
+      id: 'step-batch',
+      name: 'steps',
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+      points: route,
+    );
+    final engine = RouteSimulationEngine(
+        definition,
+        const SimulationConfig(
+            speed: 2, stepsPerMeter: 1, linkRatio: 2, dynamicIntensity: false));
+    engine.nextForSteps(6);
+    expect(engine.distanceTraveled, closeTo(6, 0.001));
+  });
 }

@@ -60,6 +60,14 @@ cd "`dirname \"$PRG\"`/" >/dev/null
 APP_HOME="`pwd -P`"
 cd "$SAVED" >/dev/null
 
+# Use the optional project-local JDK on Unix hosts. Flutter may otherwise select
+# a newer Android Studio runtime that is incompatible with this Gradle wrapper.
+LOCAL_JDK="$APP_HOME/../.dart-local/jdk17/usr/lib/jvm/java-17-openjdk"
+if [ -x "$LOCAL_JDK/bin/java" ]; then
+    JAVA_HOME="$LOCAL_JDK"
+    export JAVA_HOME
+fi
+
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
 # Determine the Java command to use to start the JVM.

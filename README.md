@@ -144,11 +144,12 @@ flowchart TB
 
 | 组件 | 版本 / 说明 |
 | --- | --- |
-| Flutter | 3.41.6 已验证（Dart 3.11.4） |
+| Flutter | 3.47.6 已验证（Dart 3.13.5） |
 | Android SDK | `compileSdk` / `targetSdk` 36，`minSdk` 24（Android 7.0+） |
 | JDK | 17（`sourceCompatibility` / `targetCompatibility`） |
-| Android Gradle Plugin | 8.9.1 |
-| Kotlin | 2.1.0 |
+| Gradle | 8.14.3 |
+| Android Gradle Plugin | 8.11.1 |
+| Kotlin | 2.2.20 |
 | 百度地图 Android SDK | 7.6.5，已放在 `android/app/libs/` |
 | 设备 ABI | 百度原生库仅提供 **arm64-v8a**，请使用 64 位 ARM 真机 |
 
@@ -173,6 +174,24 @@ sdk.dir=D:\\Android\\Sdk
 flutter.sdk=D:\\flutter
 MAPS_API_KEY=你的百度地图 Android SDK AK
 ```
+
+在 Arch Linux 或其他 Linux 系统上，将上面的路径替换为本机实际路径，例如：
+
+```properties
+sdk.dir=/home/你的用户名/Android/Sdk
+flutter.sdk=/home/你的用户名/development/flutter
+MAPS_API_KEY=你的百度地图 Android SDK AK
+```
+
+从 Windows 迁移后，在项目根目录重新执行 `flutter pub get`，以重建当前系统的
+`.dart_tool/package_config.json`。该目录是生成的本机配置，不要复制旧机器上的依赖路径。
+之后可以运行 `flutter analyze --no-pub`、`flutter test --no-pub` 和
+`flutter build apk --debug --no-pub` 验证环境。确保已安装 JDK 17、Android SDK
+以及项目所需的 SDK 组件；首次构建可能需要联网下载依赖。
+Unix 环境下，如果 `.dart-local/jdk17/usr/lib/jvm/java-17-openjdk` 存在，
+`android/gradlew` 会优先使用该项目本地 JDK；该目录不会提交到 Git。
+若使用系统 JDK，请确保 Gradle 实际运行的 Java 版本与项目的 Gradle 版本兼容，
+可在 `android` 目录运行 `./gradlew --version` 检查。
 
 > `android/local.properties` 已被 `.gitignore` 排除，不会提交。
 > 构建脚本也会读取同名环境变量 `MAPS_API_KEY`。

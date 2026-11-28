@@ -211,10 +211,17 @@ class MainActivity : FlutterActivity(), SensorEventListener {
         flutterPlatformChannel?.setMethodCallHandler { call, result ->
             when (call.method) {
                 "startMockLocation" -> {
-                    val serviceIntent = Intent(this, MockLocationService::class.java)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent) else startService(serviceIntent)
-                    mockLocationStarted = true
-                    result.success(true)
+                    if (checkMockLocationState()["allowed"] != true) {
+                        result.error("mock_permission", "请先在开发者选项中选择本应用作为模拟位置应用", null)
+                    } else try {
+                        val serviceIntent = Intent(this, MockLocationService::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent) else startService(serviceIntent)
+                        mockLocationStarted = true
+                        result.success(true)
+                    } catch (error: Exception) {
+                        mockLocationStarted = false
+                        result.error("mock_start_failed", error.message ?: "无法启动模拟定位服务", null)
+                    }
                 }
                 "pushLocation" -> {
                     val serviceIntent = Intent(this, MockLocationService::class.java).apply {
@@ -229,11 +236,16 @@ class MainActivity : FlutterActivity(), SensorEventListener {
                         putExtra("networkSimulation", call.argument<Boolean>("networkSimulation") ?: false)
                         putExtra("intervalMillis", (call.argument<Int>("intervalMillis") ?: 200).toLong())
                     }
-                    if (mockLocationStarted) startService(serviceIntent)
-                    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent)
-                    else startService(serviceIntent)
-                    mockLocationStarted = true
-                    result.success(true)
+                    try {
+                        if (mockLocationStarted) startService(serviceIntent)
+                        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(serviceIntent)
+                        else startService(serviceIntent)
+                        mockLocationStarted = true
+                        result.success(true)
+                    } catch (error: Exception) {
+                        mockLocationStarted = false
+                        result.error("mock_update_failed", error.message ?: "无法更新模拟位置", null)
+                    }
                 }
                 "stopMockLocation" -> {
                     stopService(Intent(this, MockLocationService::class.java))

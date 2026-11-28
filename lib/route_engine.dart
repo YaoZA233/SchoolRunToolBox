@@ -368,6 +368,7 @@ class RouteSimulationEngine {
   double _currentAltitudeOffsetMeters = 0;
   double _targetAltitudeOffsetMeters = 0;
   double _pendingLinkedDistanceMeters = 0;
+  SimulationFrame? _lastFrame;
 
   bool get finished => _finished;
   int get completedLoops => _completedLoops;
@@ -450,7 +451,7 @@ class RouteSimulationEngine {
         final simulated = _applyNaturalAltitudeVariation(
           _applyNaturalPathVariation(interpolated, bearing),
         );
-        return SimulationFrame(
+        return _lastFrame = SimulationFrame(
           point: simulated,
           progress: progress,
           loop: _completedLoops,
@@ -463,7 +464,7 @@ class RouteSimulationEngine {
       distanceStep -= remainingInSegment;
       _advanceSegment();
     }
-    return SimulationFrame(
+    return _lastFrame = SimulationFrame(
       point: _applyNaturalAltitudeVariation(_points.last),
       progress: 1,
       loop: _completedLoops,
@@ -479,28 +480,24 @@ class RouteSimulationEngine {
   /// 里程累计达到阈值才推进「一整个 tick」，而不是把步数直接换算成前近距离。
   /// 阈值默认 1 米。
   SimulationFrame nextForSteps(int steps) {
-    if (steps <= 0) {
-      return SimulationFrame(
-        point: _points[_segmentIndex],
-        progress: progress,
-        loop: _completedLoops,
-        finished: _finished,
-      );
-    }
+    final current = _lastFrame ??
+        SimulationFrame(
+          point: _points.first,
+          progress: progress,
+          loop: _completedLoops,
+          finished: _finished,
+        );
+    if (steps <= 0 || _finished) return current;
     final stepsPerMeter =
         config.stepsPerMeter <= 0 ? 1.0 : config.stepsPerMeter;
     _pendingLinkedDistanceMeters += steps / stepsPerMeter;
     final threshold = config.linkRatio <= 0 ? 1.0 : config.linkRatio;
-    if (_pendingLinkedDistanceMeters < threshold) {
-      return SimulationFrame(
-        point: _points[_segmentIndex],
-        progress: progress,
-        loop: _completedLoops,
-        finished: _finished,
-      );
+    var result = current;
+    while (_pendingLinkedDistanceMeters >= threshold && !_finished) {
+      _pendingLinkedDistanceMeters -= threshold;
+      result = next();
     }
-    _pendingLinkedDistanceMeters -= threshold;
-    return next();
+    return result;
   }
 
   void updateConfig(SimulationConfig next) {
